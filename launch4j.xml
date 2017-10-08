@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>C:\Users\ggalantsev\IdeaProjects\ImageComparatorFX\out\artifacts\ImageComparatorFX\ImageComparatorFX.jar</jar>
+  <outfile>C:\Users\ggalantsev\IdeaProjects\ImageComparatorFX\out\artifacts\ImageComparatorFX\Image Comparator.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl>https://www.facebook.com/g.galantsev</supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>C:\Users\ggalantsev\IdeaProjects\ImageComparatorFX\src\_logo.ico</icon>
+  <jre>
+    <path></path>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <minVersion>1.8.0</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+  </jre>
+  <versionInfo>
+    <fileVersion>1.0.0.0</fileVersion>
+    <txtFileVersion>release</txtFileVersion>
+    <fileDescription>Image comparator highlights differences between two pictures with red rectangles. Accepted format: *.png.</fileDescription>
+    <copyright>ggalantsev</copyright>
+    <productVersion>1.0.0.0</productVersion>
+    <txtProductVersion>release</txtProductVersion>
+    <productName>Image comparator</productName>
+    <companyName>GGalantsev</companyName>
+    <internalName>ImageComparatorFX</internalName>
+    <originalFilename>ImageComparatorFX.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
+  </versionInfo>
+</launch4jConfig>
