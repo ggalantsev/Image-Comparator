@@ -24,9 +24,9 @@
     <runtimeBits>64/32</runtimeBits>
   </jre>
   <versionInfo>
-    <fileVersion>1.0.0.0</fileVersion>
+    <fileVersion>1.1.0.0</fileVersion>
     <txtFileVersion>release</txtFileVersion>
-    <fileDescription>Image comparator highlights differences between two pictures with red rectangles. Accepted format: *.png.</fileDescription>
+    <fileDescription>Image comparator highlights differences between two pictures with red rectangles.</fileDescription>
     <copyright>ggalantsev</copyright>
     <productVersion>1.1.0.0</productVersion>
     <txtProductVersion>release</txtProductVersion>
