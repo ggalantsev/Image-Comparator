@@ -4,12 +4,13 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.*;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -19,7 +20,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -72,16 +72,31 @@ public class Controller {
     private CheckBox secondCheckBox;
 
     @FXML
-    private Rectangle canvas;
+    private TabPane tabs;
+
+    @FXML
+    private Tab comparatorTab;
+
+    @FXML
+    private Tab resultTab;
 
     @FXML
     private ImageView comparedImage;
+
+    @FXML
+    private ScrollPane comparedImageScrollPane;
+
+    @FXML
+    private StackPane comparedImagePane;
 
     @FXML
     private Button saveImageButton;
 
     @FXML
     private Button hideImageButton;
+
+    @FXML
+    private Text error;
 
     @FXML
     public void setFirstPic() {
@@ -147,12 +162,12 @@ public class Controller {
 
         runCompareTask(deviationVal, distanceVal);
 
-        setComparedPictureName();
     }
 
     private void runCompareTask(double deviationVal, int distanceVal) {
         progressIndicator.setVisible(true);
         compareButton.setText("");
+        error.setVisible(false);
         CompareImagesTask task = new CompareImagesTask(
                 firstPic.getText(),
                 secondPic.getText(),
@@ -169,10 +184,16 @@ public class Controller {
                 new EventHandler<WorkerStateEvent>() {
                     @Override
                     public void handle(WorkerStateEvent t) {
+                        try {
                             bufferedImage = task.getValue();
                             showComparedImage();
+                            setComparedPictureName();
+                        } catch (NullPointerException e) {
+                            error.setVisible(true);
+                        } finally {
                             progressIndicator.setVisible(false);
                             compareButton.setText("Compare!");
+                        }
                     }
                 });
     }
@@ -180,10 +201,23 @@ public class Controller {
     private void showComparedImage() {
         WritableImage writableImage = SwingFXUtils.toFXImage(bufferedImage, null);
         comparedImage.setImage(writableImage);
-        comparedImage.setVisible(true);
-        saveImageButton.setVisible(true);
-        hideImageButton.setVisible(true);
-        canvas.setVisible(true);
+
+        comparedImage.setFitHeight(bufferedImage.getHeight());
+        comparedImage.setFitWidth(bufferedImage.getWidth());
+
+        resultTab.setDisable(false);
+        tabs.getSelectionModel().select(resultTab);
+    }
+
+    @FXML
+    private void changeImageViewSize(){
+        if ( (int) comparedImage.getFitHeight() == bufferedImage.getHeight() && (int) comparedImage.getFitWidth() == bufferedImage.getWidth()){
+            comparedImage.setFitHeight(comparedImageScrollPane.getHeight());
+            comparedImage.setFitWidth(comparedImageScrollPane.getWidth());
+        } else {
+            comparedImage.setFitHeight(bufferedImage.getHeight());
+            comparedImage.setFitWidth(bufferedImage.getWidth());
+        }
     }
 
     private void setComparedPictureName() {
@@ -221,10 +255,7 @@ public class Controller {
 
     @FXML
     private void hideImageView() {
-        comparedImage.setVisible(false);
-        saveImageButton.setVisible(false);
-        hideImageButton.setVisible(false);
-        canvas.setVisible(false);
+        tabs.getSelectionModel().select(comparatorTab);
     }
 
     @FXML
@@ -258,7 +289,6 @@ public class Controller {
         } catch (NumberFormatException e) {
             wrongDeviationText.setVisible(true);
             deviationSlider.setVisible(false);
-            return;
         }
     }
 
@@ -274,30 +304,26 @@ public class Controller {
         } catch (NumberFormatException e) {
             wrongDistanceText.setVisible(true);
             distanceSlider.setVisible(false);
-            return;
         }
     }
 
     @FXML
-    public void updateDeviationTextField(){
+    public void updateDeviationTextField() {
         deviation.setText(
-                String.format("%.1f",deviationSlider.getValue()));
+                String.format("%.1f", deviationSlider.getValue()));
     }
 
     @FXML
-    public void updateDistanceTextField(){
-        distance.setText(String.valueOf((int)distanceSlider.getValue()));
+    public void updateDistanceTextField() {
+        distance.setText(String.valueOf((int) distanceSlider.getValue()));
     }
 
     @FXML
     private void openGithub() {
         try {
             Desktop.getDesktop().browse(new URI("https://github.com/ggalantsev/"));
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        } catch (URISyntaxException e1) {
+        } catch (IOException | URISyntaxException e1) {
             e1.printStackTrace();
         }
     }
-
 }
