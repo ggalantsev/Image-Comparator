@@ -1,10 +1,8 @@
 package ggalantsev;
 
 import javafx.concurrent.Task;
-import ggalantsev.Comparator.ImageComparator;
-
+import ggalantsev.ImageComparator.ImageComparator;
 import java.awt.image.BufferedImage;
-
 
 public class CompareImagesTask extends Task<BufferedImage> {
 
@@ -12,7 +10,6 @@ public class CompareImagesTask extends Task<BufferedImage> {
     private String secondImg;
     private double deviation;
     private int distance;
-    private BufferedImage image;
     private boolean firstIsMain;
 
     public CompareImagesTask(String firstImg, String secondImg, double deviation, int distance, boolean firstIsMain) {
@@ -26,31 +23,14 @@ public class CompareImagesTask extends Task<BufferedImage> {
 
     @Override
     protected BufferedImage call() throws Exception {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    updateProgressBar();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
         ImageComparator imageComparator = new ImageComparator(firstImg, secondImg, firstIsMain);
         imageComparator.setDeviation(deviation);
         imageComparator.setDistance(distance);
-        image = imageComparator.compare();
 
-        return image;
-    }
-
-    private void updateProgressBar() throws InterruptedException {
-        for (int i = 0; i <= 100; i++) {
-            this.updateProgress(i, 100);
-            this.updateMessage(i + " %");
-            Thread.sleep(20);
+        try {
+            return imageComparator.compare();
+        } catch (NullPointerException e){
+            return null;
         }
     }
-
-
 }

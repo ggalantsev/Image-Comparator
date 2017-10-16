@@ -1,4 +1,4 @@
-package ggalantsev.Comparator;
+package ggalantsev.ImageComparator;
 
 import java.util.Comparator;
 import java.util.List;
@@ -22,8 +22,6 @@ public class Rectangle {
                 list.stream().map(point -> point.getX()).min(Comparator.comparingInt(o -> o)).get(),
                 list.stream().map(point -> point.getY()).min(Comparator.comparingInt(o -> o)).get()
         );
-//        System.out.print("min: " + min);
-//        System.out.print(" max: " + max);
     }
 
     public Point getMin() {
@@ -42,16 +40,12 @@ public class Rectangle {
         this.max = max;
     }
 
-    public Point getCenter() {
-        return new Point(min.getX() + (max.getX() - min.getX()) / 2, min.getY() + (max.getY() - min.getY()) / 2);
+    public int getHeight(){
+        return Math.abs(this.max.getY()-this.min.getY());
     }
 
-    public double getRadiusX() {
-        return (max.getX() - min.getX());
-    }
-
-    public double getRadiusY() {
-        return (max.getY() - min.getY());
+    public int getWidth(){
+        return Math.abs(this.max.getX()-this.min.getX());
     }
 
     @Override

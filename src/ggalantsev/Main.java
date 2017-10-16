@@ -10,10 +10,14 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("View/comparator.fxml"));
+        Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Image comparator");
-        primaryStage.setScene(new Scene(root, primaryStage.getWidth(), primaryStage.getHeight()));
-        primaryStage.setResizable(false);
+        primaryStage.setMinHeight(460);
+        primaryStage.setMinWidth(620);
+        primaryStage.setWidth(720);
+        primaryStage.setHeight(480);
         primaryStage.show();
     }
 

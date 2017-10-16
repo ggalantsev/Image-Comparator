@@ -1,0 +1,22 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="ImageComparatorFX">
+    <output-path>$PROJECT_DIR$/out/artifacts/ImageComparatorFX</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="ggalantsev.Main" />
+        <option name="description" value="Image comparator highlights differences between two pictures with red rectangles. " />
+        <option name="height" value="480" />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="title" value="Image comparator" />
+        <option name="vendor" value="GGalantsev" />
+        <option name="version" value="1.1.0.0" />
+        <option name="width" value="720" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="ImageComparatorFX.jar">
+        <element id="module-output" name="ImageComparatorFX" />
+      </element>
+    </root>
+  </artifact>
+</component>

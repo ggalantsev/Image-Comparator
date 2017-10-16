@@ -1,6 +1,7 @@
-package ggalantsev.Comparator;
+package ggalantsev.ImageComparator;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -38,24 +39,23 @@ public class ImageComparator {
         LOGGER.setUseParentHandlers(false);
     }
 
-    // Comparator fields
+    // ImageComparator fields
     private BufferedImage img1 = null;
     private BufferedImage img2 = null;
-    private boolean firstIsMain; // main img to draw rectangles
+    private boolean firstIsMain; // Selecting image for drawing rectangles
 
-    private double deviation = 0.2; // color deviation btw images
-    private int distance = 25; // distance to near point to be added in rectangle
-
+    private double deviation = 0.2; // color deviation between images
+    private int distance = 25; // distance to near point for adding in rectangle
 
     public ImageComparator(String img1, String img2, boolean firstIsMain) {
         this.img1 = readImageFromFile(img1);
         this.img2 = readImageFromFile(img2);
         this.firstIsMain = firstIsMain;
+        LOGGER.info("ImageComparator initialized.");
     }
 
-    public BufferedImage compare() {
-        LOGGER.info("Deviation: " + deviation + ". Distance: " + distance + ".");
-
+    public BufferedImage compare() throws NullPointerException {
+        LOGGER.info("Comparing started...");
         BufferedImage mainImg;
         if (firstIsMain) {
             mainImg = this.img1;
@@ -65,61 +65,67 @@ public class ImageComparator {
 
         List<Point> differentPoints = getDifferentPoints();
 
+        LOGGER.info("Deviation: " + deviation + ". Distance: " + distance + ".");
         LOGGER.info("Number of Different Points: " + differentPoints.size() + ".");
 
-        drawRectangles(
-                getRectangles(
-                        differentPoints),
+        return drawRectangles(
+                getRectangles(differentPoints),
                 mainImg);
-        return mainImg;
     }
 
     private List<Point> getDifferentPoints() {
-        List<Point> list = new ArrayList<>();
+        boolean imagesHaveDifferentResolution = false;
+        List<Point> list = new LinkedList<>();
         for (int i = 0; i < img1.getWidth(); i++) {
             for (int j = 0; j < img1.getHeight(); j++) {
-                if (isDifferent(img1.getRGB(i, j), img2.getRGB(i, j))) {
-                    list.add(new Point(i, j));
+                try {
+                    if (isColorDifferent(img1.getRGB(i, j), img2.getRGB(i, j))) {
+                        list.add(new Point(i, j));
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    imagesHaveDifferentResolution = true;
                 }
             }
         }
+
+        if(imagesHaveDifferentResolution) LOGGER.warning("Images have different resolutions");
+
         return list;
     }
 
     private BufferedImage drawRectangles(List<Rectangle> rectangles, BufferedImage img) {
         for (Rectangle rectangle : rectangles) {
-            drawRectangle(rectangle, img);
+            img = drawRectangle(rectangle, img);
         }
         return img;
     }
 
-    private BufferedImage drawRectangle(Rectangle rectangle, BufferedImage image) {
-        for (int i = rectangle.getMin().getX() - 1; i < rectangle.getMax().getX() + 1; i++) {
-            image.setRGB(i, rectangle.getMin().getY() - 1, 0xffff0000);
-            image.setRGB(i, rectangle.getMin().getY() - 2, 0xffff0000);
-            image.setRGB(i, rectangle.getMax().getY() + 1, 0xffff0000);
-            image.setRGB(i, rectangle.getMax().getY() + 2, 0xffff0000);
-        }
+    private BufferedImage drawRectangle(Rectangle rectangle, BufferedImage image){
+        Graphics2D g2d = image.createGraphics();
+        int thickness = 2;
+        Stroke oldStroke = g2d.getStroke();
+        g2d.setStroke(new BasicStroke(thickness));
+        g2d.setColor(Color.RED);
+        g2d.drawRect(
+                rectangle.getMin().getX(),
+                rectangle.getMin().getY(),
+                rectangle.getWidth(),
+                rectangle.getHeight());
+        g2d.setStroke(oldStroke);
 
-        for (int i = rectangle.getMin().getY() - 1; i <= rectangle.getMax().getY() + 1; i++) {
-            image.setRGB(rectangle.getMin().getX() - 1, i, 0xffff0000);
-            image.setRGB(rectangle.getMin().getX() - 2, i, 0xffff0000);
-            image.setRGB(rectangle.getMax().getX() + 1, i, 0xffff0000);
-            image.setRGB(rectangle.getMax().getX() + 2, i, 0xffff0000);
-        }
         return image;
     }
 
     private List<Rectangle> getRectangles(List<Point> differentPoints) {
         List<Rectangle> rectangles = new ArrayList<>();
         while (!differentPoints.isEmpty()) {
-            List<Point> area = new LinkedList<>();
+            List<Point> area = new ArrayList<>();
             Point point = differentPoints.get(0);
             collectNearPoints(differentPoints, area, point);
             rectangles.add(new Rectangle(area));
             area.clear();
         }
-        LOGGER.info("Images have " + rectangles.size() + " different areas.\n");
+        LOGGER.info("Images have " + rectangles.size() + " different areas.");
         return rectangles;
     }
 
@@ -131,7 +137,7 @@ public class ImageComparator {
             boolean newPointsAdded = true;
             Rectangle rectangle = new Rectangle(point, point);
 
-            while (newPointsAdded) {
+            while (newPointsAdded) { // extend rectangle while no new different points near
                 newPointsAdded = false;
                 for (Iterator<Point> iter = differentPoints.iterator(); iter.hasNext(); ) {
                     Point next = iter.next();
@@ -143,7 +149,7 @@ public class ImageComparator {
                 }
                 rectangle = new Rectangle(area);
             }
-            LOGGER.info("All points: " + differentPoints.size() + ".\tArea points: " + area.size() + "." + "\nRectangle: " + rectangle.toString() + "." );
+            LOGGER.info("All points: " + differentPoints.size() + ".\tArea points: " + area.size() + "." + "\nRectangle: " + rectangle.toString() + ".");
         }
         return;
     }
@@ -159,26 +165,17 @@ public class ImageComparator {
         }
     }
 
-
-    private void writeImageToFile(BufferedImage img, String output) {
-        try {
-            ImageIO.write(img, "PNG", new File(output));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private BufferedImage readImageFromFile(String imgName) {
         BufferedImage img = null;
         try {
             img = ImageIO.read(new File(imgName));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warning("Can't read image \"" + imgName + "\" from file!");
         }
         return img;
     }
 
-    private boolean isDifferent(int color1, int color2) {
+    private boolean isColorDifferent(int color1, int color2) {
         int c1r = (color1 & 0x00ff0000) >> 4 * 4; // red channel
         int c1g = (color1 & 0x0000ff00) >> 2 * 4; // green channel
         int c1b = (color1 & 0x000000ff); // blue channel
@@ -209,6 +206,14 @@ public class ImageComparator {
 
     public void setDistance(int distance) {
         this.distance = distance;
+    }
+
+    public static void writeImageToFile(BufferedImage img, String output) {
+        try {
+            ImageIO.write(img, "PNG", new File(output));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
